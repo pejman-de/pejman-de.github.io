@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir *)",
+      "Bash(python3 -)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm build *)",
+      "Bash(npx tsc *)",
+      "Bash(python3 *)",
+      "Bash(pnpm preview *)",
+      "Bash(grep -rniE \"DE[ ]?[0-9]{6,}\" client/src)"
+    ]
+  }
+}
