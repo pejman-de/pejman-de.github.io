@@ -149,7 +149,7 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
       telefon: "",
       consent: false,
       offer_type: "vermietung",
-      lead_path: "direct",
+      lead_path: "Standard-Mietanfrage-Pfad",
       website: "",
     },
   });
