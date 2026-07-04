@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { LeadFormModalProvider } from "./contexts/LeadFormModalContext";
+import LeadFormModal from "./components/LeadFormModal";
 import Home from "./pages/Home";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
@@ -36,7 +38,10 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <LeadFormModalProvider>
+            <Router />
+            <LeadFormModal />
+          </LeadFormModalProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

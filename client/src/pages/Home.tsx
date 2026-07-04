@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
@@ -7,9 +6,9 @@ import VehicleCategories from "@/components/VehicleCategories";
 import ProcessSection from "@/components/ProcessSection";
 import TrustMetrics from "@/components/TrustMetrics";
 import ProofBlock from "@/components/ProofBlock";
-import LeadForm from "@/components/LeadForm";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
 
 // Animation Variants for clean scroll-reveals
 const fadeInUp = {
@@ -33,13 +32,7 @@ const staggerContainer = {
 };
 
 export default function Home() {
-  const formRef = useRef<HTMLDivElement>(null);
-  const vehiclesRef = useRef<HTMLDivElement>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
-
-  const scrollToForm = () => {
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const { openLeadForm } = useLeadFormModal();
 
   const scrollToVehicles = () => {
     const vehiclesElement = document.getElementById("vehicles");
@@ -47,8 +40,7 @@ export default function Home() {
   };
 
   const handleSelectCategory = (categoryTitle: string) => {
-    setSelectedCategory(categoryTitle);
-    scrollToForm();
+    openLeadForm(categoryTitle);
   };
 
   const scrollToTop = () => {
@@ -58,11 +50,11 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Sticky Header */}
-      <Header onCtaClick={scrollToForm} />
+      <Header onCtaClick={() => openLeadForm()} />
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <Hero onCtaClick={scrollToForm} onExploreClick={scrollToVehicles} />
+        <Hero onCtaClick={() => openLeadForm()} onExploreClick={scrollToVehicles} />
 
         {/* Social Proof Bar */}
         <motion.div
@@ -112,16 +104,6 @@ export default function Home() {
           variants={fadeInUp}
         >
           <ProofBlock />
-        </motion.div>
-
-        {/* Lead Form Section */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeInUp}
-        >
-          <LeadForm ref={formRef} selectedCategory={selectedCategory} />
         </motion.div>
 
         {/* FAQ Section */}

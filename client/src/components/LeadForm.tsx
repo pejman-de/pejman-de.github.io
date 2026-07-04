@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState, useEffect, forwardRef } from "react";
+import { useState } from "react";
+import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,11 +114,21 @@ function calculateLeadScore(data: FormData): { grade: "Hot" | "Warm" | "Cold"; p
   return { grade, points };
 }
 
-interface LeadFormProps {
-  selectedCategory?: string;
-}
+const CATEGORY_TO_FAHRZEUGTYP: Record<string, string> = {
+  "Sprinter": "sprinter",
+  "Transporter": "transporter",
+  "Wechselbrücke": "wechselbruecke",
+  "Kipper": "kipper",
+  "Sattelzug": "sattelzug",
+  "Gliederzug": "gliederzug",
+};
 
-const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }, ref) => {
+function LeadForm() {
+  const { selectedCategory } = useLeadFormModal();
+  const initialFahrzeugtyp = selectedCategory
+    ? (CATEGORY_TO_FAHRZEUGTYP[selectedCategory] ?? selectedCategory.toLowerCase())
+    : "";
+
   const [step, setStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -134,7 +145,7 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
     resolver: zodResolver(formSchema),
     mode: "onTouched",
     defaultValues: {
-      fahrzeugtyp: "",
+      fahrzeugtyp: initialFahrzeugtyp,
       tonnage: "",
       mietdauer: "",
       starttermin: "",
@@ -153,15 +164,6 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
       website: "",
     },
   });
-
-  // Update selected vehicle type if user clicks on a vehicle category card
-  useEffect(() => {
-    if (selectedCategory) {
-      const lowerCategory = selectedCategory.toLowerCase();
-      setValue("fahrzeugtyp", lowerCategory);
-      setStep(1); // Immer auf Schritt 1 starten bei Kachel-Klick
-    }
-  }, [selectedCategory, setValue]);
 
   const handleNextStep = async () => {
     // Validieren Sie AUSSCHLIESSLICH die Felder von Schritt 1
@@ -238,19 +240,15 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
   };
 
   return (
-    <section id="contact-form" ref={ref} className="py-12 md:py-20 bg-brand-light scroll-mt-20">
-      <div className="container max-w-4xl">
-        <div className="text-center mb-6 md:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy md:text-4xl">
-            Ihr Mietangebot in 24h.
-          </h2>
-          <p className="mt-2 text-sm sm:text-base md:text-lg text-brand-grey max-w-xl mx-auto">
-            Kostenlos, unverbindlich und ohne Verkaufsgespräch. Formular ausfüllen, Angebot abwarten, fertig.
-          </p>
-        </div>
-
-        {/* Form Container with Shadow */}
-        <div className="bg-white rounded-xl md:rounded-2xl border border-brand-grey/15 p-4 sm:p-6 md:p-10 shadow-xl relative overflow-hidden">
+    <div className="bg-white rounded-xl md:rounded-2xl border border-brand-grey/15 p-4 sm:p-6 md:p-10 shadow-xl relative overflow-hidden">
+      <div className="text-center mb-6 md:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy md:text-4xl">
+          Ihr Mietangebot in 24h.
+        </h2>
+        <p className="mt-2 text-sm sm:text-base md:text-lg text-brand-grey max-w-xl mx-auto">
+          Kostenlos, unverbindlich und ohne Verkaufsgespräch. Formular ausfüllen, Angebot abwarten, fertig.
+        </p>
+      </div>
           
           {isSuccess ? (
             <motion.div
@@ -699,11 +697,8 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
               </form>
             </div>
           )}
-        </div>
       </div>
-    </section>
-  );
-});
+    );
+  }
 
-LeadForm.displayName = "LeadForm";
 export default LeadForm;

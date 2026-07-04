@@ -3,22 +3,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ArrowLeft, ShieldCheck, Eye, Lock, Globe, Settings, BarChart2, Shield, UserCheck, Calendar } from "lucide-react";
 import { Link } from "wouter";
+import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
 
 export default function Datenschutz() {
+  const { openLeadForm } = useLeadFormModal();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-brand-light">
-      <Header onCtaClick={() => {
-        const contactForm = document.getElementById("contact-form");
-        if (contactForm) {
-          contactForm.scrollIntoView({ behavior: "smooth" });
-        } else {
-          window.location.href = "/#contact-form";
-        }
-      }} />
+      <Header onCtaClick={() => openLeadForm()} />
 
       <main className="flex-grow py-16 md:py-24">
         <div className="container max-w-4xl">
