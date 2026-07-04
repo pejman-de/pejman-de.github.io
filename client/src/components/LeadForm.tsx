@@ -40,7 +40,6 @@ const formSchema = z.object({
   // Hidden fields
   offer_type: z.string(),
   lead_path: z.string(),
-  page_variant: z.string(),
   website: z.string().optional(), // Honeypot – muss leer bleiben
 });
 
@@ -61,7 +60,6 @@ interface FormData {
   consent: boolean;
   offer_type: string;
   lead_path: string;
-  page_variant: string;
   website?: string;
 }
 
@@ -130,7 +128,6 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
       consent: false,
       offer_type: "vermietung",
       lead_path: "direct",
-      page_variant: "lp-vermietung",
       website: "",
     },
   });
@@ -190,7 +187,11 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
         versicherung: data.versicherung,
         offer_type: data.offer_type,
         lead_path: data.lead_path,
-        page_variant: data.page_variant,
+        utm_source: new URLSearchParams(window.location.search).get("utm_source") || "direct",
+        utm_medium: new URLSearchParams(window.location.search).get("utm_medium") || "none",
+        utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign") || "none",
+        utm_term: new URLSearchParams(window.location.search).get("utm_term") || "none",
+        utm_content: new URLSearchParams(window.location.search).get("utm_content") || "none",
       };
 
       const response = await fetch(import.meta.env.VITE_LEAD_ENDPOINT, {
@@ -662,7 +663,6 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
                 {/* Hidden Fields */}
                 <input type="hidden" {...register("offer_type")} />
                 <input type="hidden" {...register("lead_path")} />
-                <input type="hidden" {...register("page_variant")} />
 
                 {/* Honeypot Feld gegen Spam-Bots – für echte Nutzer unsichtbar */}
                 <input
