@@ -64,31 +64,53 @@ interface FormData {
 }
 
 // Lead Scoring Algorithm Utility
-function calculateLeadScore(data: FormData): { score: "Category A (Hot)" | "Category B (Warm)" | "Category C (Cold)"; points: number } {
+// Lead-Scoring Algorithm (Brevo-Master-Scoring compatible: Hot >=70, Warm 40-69, Cold <40)
+function calculateLeadScore(data: FormData): { grade: "Hot" | "Warm" | "Cold"; points: number } {
+  let points = 0;
+
+  // 1. Tonnage (Auftragswert-Indikator, staerkster Faktor)
+  const tonnagePoints: Record<string, number> = {
+    "7_5t": 40,
+    "5_5t": 30,
+    "3_5t": 20,
+    "2_6t": 10,
+  };
+  points += tonnagePoints[data.tonnage] ?? 10;
+
+  // 2. Starttermin (Dringlichkeit)
   const today = new Date();
   const start = new Date(data.starttermin);
   const diffTime = start.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  // Parse Mietdauer for scoring
-  const isLongTerm = data.mietdauer === "30plus" || data.mietdauer === "90plus";
-
-  // Category A (Hot) conditions:
-  // - Starttermin < 7 days from today
-  // - OR Mietdauer > 30 days
-  if (diffDays < 7 || isLongTerm) {
-    return { score: "Category A (Hot)", points: 100 };
+  if (diffDays < 7) {
+    points += 30;
+  } else if (diffDays <= 21) {
+    points += 20;
+  } else {
+    points += 10;
   }
 
-  // Category B (Warm) conditions:
-  // - Starttermin is between 7 and 21 days from today
-  if (diffDays >= 7 && diffDays <= 21) {
-    return { score: "Category B (Warm)", points: 50 };
+  // 3. Mietdauer (Auftragsgroesse/Bindung)
+  const mietdauerPoints: Record<string, number> = {
+    "90plus": 30,
+    "30plus": 20,
+    "8-30": 15,
+    "1-7": 10,
+  };
+  points += mietdauerPoints[data.mietdauer] ?? 10;
+
+  // 4. Versicherung gewaehlt (Zusatzverkauf-Bonus)
+  if (data.versicherung) {
+    points += 10;
   }
 
-  // Category C (Cold) conditions:
-  // - default fallback / incomplete or far in future
-  return { score: "Category C (Cold)", points: 10 };
+  // Map points to Hot/Warm/Cold
+  let grade: "Hot" | "Warm" | "Cold";
+  if (points >= 70) grade = "Hot";
+  else if (points >= 40) grade = "Warm";
+  else grade = "Cold";
+
+  return { grade, points };
 }
 
 interface LeadFormProps {
@@ -164,8 +186,8 @@ const LeadForm = forwardRef<HTMLDivElement, LeadFormProps>(({ selectedCategory }
     setIsSubmitting(true);
 
     try {
-      const { score, points } = calculateLeadScore(data);
-      const leadGrade = score.match(/\(([^)]+)\)/)?.[1] ?? score;
+      const { grade, points } = calculateLeadScore(data);
+      const leadGrade = grade;
 
       const payload = {
         firstName: data.vorname,
