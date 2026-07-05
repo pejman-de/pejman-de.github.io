@@ -2,6 +2,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
+import { trackClick, trackFaqToggle } from "@/lib/analytics";
 
 const faqs = [
   {
@@ -39,7 +40,14 @@ export default function FAQ() {
             Fahrzeug wählen, Formular ausfüllen, in 24h ein individuelles Angebot erhalten. Unverbindlich und kostenlos.
           </p>
           <Button
-            onClick={() => openLeadForm()}
+            onClick={() => {
+              trackClick("cta_click", {
+                element_id: "faq_cta",
+                element_text: "Jetzt Mietangebot anfordern",
+                element_location: "faq",
+              });
+              openLeadForm();
+            }}
             className="mt-6 bg-brand-cyan text-brand-navy hover:bg-brand-cyan/90 font-bold px-6 py-3 shadow-md hover:shadow-brand-cyan/20 hover:shadow-lg transition-all active:scale-95 inline-flex items-center gap-2"
           >
             <span>Jetzt Mietangebot anfordern</span>
@@ -60,7 +68,18 @@ export default function FAQ() {
         </div>
 
         {/* Accordion Component */}
-        <Accordion type="single" collapsible className="w-full space-y-4">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full space-y-4"
+          onValueChange={(value) => {
+            // value ist "item-<idx>" beim Öffnen, "" beim Schließen
+            if (value) {
+              const idx = parseInt(value.replace("item-", ""), 10);
+              trackFaqToggle(faqs[idx]?.question ?? value, true);
+            }
+          }}
+        >
           {faqs.map((faq, idx) => (
             <AccordionItem
               key={idx}

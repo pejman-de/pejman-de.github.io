@@ -9,6 +9,8 @@ import ProofBlock from "@/components/ProofBlock";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
+import { useScrollDepth } from "@/hooks/useScrollDepth";
+import { useSectionView } from "@/hooks/useSectionView";
 
 // Animation Variants for clean scroll-reveals
 const fadeInUp = {
@@ -33,6 +35,12 @@ const staggerContainer = {
 
 export default function Home() {
   const { openLeadForm } = useLeadFormModal();
+  useScrollDepth();
+
+  const processRef = useSectionView<HTMLDivElement>("process_section");
+  const trustRef = useSectionView<HTMLDivElement>("trust_metrics");
+  const proofRef = useSectionView<HTMLDivElement>("proof_block");
+  const faqRef = useSectionView<HTMLDivElement>("faq_section");
 
   const scrollToVehicles = () => {
     const vehiclesElement = document.getElementById("vehicles");
@@ -40,7 +48,7 @@ export default function Home() {
   };
 
   const handleSelectCategory = (categoryTitle: string) => {
-    openLeadForm(categoryTitle);
+    openLeadForm(categoryTitle, "vehicle_tile");
   };
 
   const scrollToTop = () => {
@@ -50,11 +58,11 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Sticky Header */}
-      <Header onCtaClick={() => openLeadForm()} />
+      <Header onCtaClick={() => openLeadForm(undefined, "header_cta")} />
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <Hero onCtaClick={() => openLeadForm()} onExploreClick={scrollToVehicles} />
+        <Hero onCtaClick={() => openLeadForm(undefined, "hero_primary_cta")} onExploreClick={scrollToVehicles} />
 
         {/* Social Proof Bar */}
         <motion.div
@@ -78,6 +86,7 @@ export default function Home() {
 
         {/* Process Section */}
         <motion.div
+          ref={processRef}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -88,6 +97,7 @@ export default function Home() {
 
         {/* Trust Metrics */}
         <motion.div
+          ref={trustRef}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -98,6 +108,7 @@ export default function Home() {
 
         {/* Proof Block */}
         <motion.div
+          ref={proofRef}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -108,6 +119,7 @@ export default function Home() {
 
         {/* FAQ Section */}
         <motion.div
+          ref={faqRef}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}

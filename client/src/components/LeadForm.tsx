@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLeadFormModal } from "@/contexts/LeadFormModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon, Shield, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  trackModalStepView,
+  trackModalStepCompleted,
+  trackFormError,
+  trackFormStart,
+  trackFormSubmit,
+} from "@/lib/analytics";
 
 // Zod validation schema
 const formSchema = z.object({
@@ -124,7 +131,7 @@ const CATEGORY_TO_FAHRZEUGTYP: Record<string, string> = {
 };
 
 function LeadForm() {
-  const { selectedCategory, closeLeadForm } = useLeadFormModal();
+  const { selectedCategory, closeLeadForm, reportStep, reportCompleted } = useLeadFormModal();
   const initialFahrzeugtyp = selectedCategory
     ? (CATEGORY_TO_FAHRZEUGTYP[selectedCategory] ?? selectedCategory.toLowerCase())
     : "";
@@ -165,6 +172,15 @@ function LeadForm() {
     },
   });
 
+  // Bei jedem Mount (= jedes Öffnen des Modals, siehe LeadFormModal.tsx key={renderKey})
+  // Schritt 1 + form_start tracken
+  useEffect(() => {
+    trackModalStepView(1, "Fahrzeugdetails", 2);
+    trackFormStart();
+    reportStep(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleNextStep = async () => {
     // Validieren Sie AUSSCHLIESSLICH die Felder von Schritt 1
     const valid = await trigger([
@@ -176,11 +192,20 @@ function LeadForm() {
       "bereitstellung",
     ]);
     if (valid) {
+      trackModalStepCompleted(1, "Fahrzeugdetails");
+      trackModalStepView(2, "Kontaktdaten", 2);
+      reportStep(2);
       setStep(2);
+    } else {
+      const errorFields = ["fahrzeugtyp", "tonnage", "mietdauer", "starttermin", "plz", "bereitstellung"].filter(
+        (field) => !!errors[field as keyof typeof errors]
+      );
+      trackFormError(1, errorFields);
     }
   };
 
   const handlePrevStep = () => {
+    reportStep(1);
     setStep(1);
   };
 
@@ -228,11 +253,22 @@ function LeadForm() {
         throw new Error(`Lead submission failed with status ${response.status}`);
       }
 
+      // Wichtig: reportCompleted() VOR setIsSuccess, damit modal_close (falls der
+      // Nutzer direkt danach schließt) NICHT zusätzlich als form_abandon zählt.
+      reportCompleted();
+      trackFormSubmit("lp1_mietanfrage", 2, {
+        lead_grade: leadGrade,
+        fahrzeugtyp: data.fahrzeugtyp,
+        tonnage: data.tonnage,
+        mietdauer: data.mietdauer,
+      });
+
       setIsSuccess(true);
       toast.success("Anfrage erfolgreich gesendet! Wir melden uns in Kürze.");
       reset();
       setStep(1); // Zurück auf Schritt 1 nach erfolgreichem Reset
     } catch (error) {
+      trackFormError(2, ["submit_failed"]);
       toast.error("Es gab einen Fehler beim Senden. Bitte versuchen Sie es erneut.");
     } finally {
       setIsSubmitting(false);

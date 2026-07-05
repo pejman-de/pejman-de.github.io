@@ -1,4 +1,6 @@
 import { Truck, ShoppingBag, Layers, Construction, Compass, Navigation, ArrowRight } from "lucide-react";
+import { trackClick } from "@/lib/analytics";
+import { useSectionView } from "@/hooks/useSectionView";
 
 interface Category {
   id: string;
@@ -58,8 +60,9 @@ interface VehicleCategoriesProps {
 }
 
 export default function VehicleCategories({ onSelectCategory }: VehicleCategoriesProps) {
+  const sectionRef = useSectionView<HTMLElement>("vehicle_categories");
   return (
-    <section id="vehicles" className="py-20 bg-white">
+    <section id="vehicles" ref={sectionRef} className="py-20 bg-white">
       <div className="container">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-extrabold tracking-tight text-brand-navy sm:text-4xl">
@@ -109,7 +112,15 @@ export default function VehicleCategories({ onSelectCategory }: VehicleCategorie
                 {/* Text Link with Hover Animation */}
                 <div className="mt-8 pt-4">
                   <button
-                    onClick={() => onSelectCategory(category.title)}
+                    onClick={() => {
+                      trackClick("tile_click", {
+                        element_id: `tile_${category.id}`,
+                        element_text: "zum Formular",
+                        element_location: "categories",
+                        extra: { category_name: category.title },
+                      });
+                      onSelectCategory(category.title);
+                    }}
                     className="inline-flex items-center text-sm font-bold text-brand-navy group-hover:text-brand-cyan transition-colors"
                   >
                     <span>zum Formular</span>
