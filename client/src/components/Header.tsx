@@ -1,5 +1,6 @@
 import { Phone, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 interface HeaderProps {
   onCtaClick: () => void;
@@ -10,13 +11,13 @@ export default function Header({ onCtaClick }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b border-brand-grey/10 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container flex items-center justify-between py-4 md:py-5">
         {/* Image Logo */}
-        <div className="flex items-center">
+        <Link href="/" className="flex items-center">
           <img
             src="/logo.png"
             alt="ED Rent & Sale Logo"
             className="h-10 md:h-12 w-auto object-contain"
           />
-        </div>
+        </Link>
 
         {/* Right side contact & CTA */}
         <div className="flex items-center gap-4 md:gap-8">
