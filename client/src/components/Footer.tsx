@@ -28,9 +28,13 @@ export default function Footer({ onScrollToTop }: FooterProps) {
             <p className="text-sm text-white max-w-sm leading-relaxed">
               Ihr zuverlässiger B2B-Partner für hochwertige Nutzfahrzeuge im Raum Leichlingen, Köln und Düsseldorf. Flexibel, schnell und sauber gewartet.
             </p>
-            <div className="flex items-center gap-3 text-xs text-white">
-              <Clock className="h-4 w-4 text-brand-cyan shrink-0" />
-              <span>B2B-Servicezeiten: Mo. - Fr. 08:00 - 17:00 Uhr</span>
+            <div className="flex items-start gap-3 text-xs text-white">
+              <Clock className="h-4 w-4 text-brand-cyan shrink-0 mt-0.5" />
+              <span>
+                Servicezeiten:<br />
+                Mo. – Fr. 09:00 – 17:00 Uhr<br />
+                Sa. – So. Nach Absprache
+              </span>
             </div>
           </div>
 
