@@ -17,7 +17,7 @@ export default function LeadFormModal() {
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeLeadForm("overlay_click")}>
       <DialogContent
         showCloseButton={false}
-        className="flex flex-col w-full h-[100dvh] max-h-[100dvh] max-w-none top-0 left-0 translate-x-0 translate-y-0 rounded-none border-0 gap-0 sm:h-auto sm:max-h-[90vh] sm:max-w-3xl sm:w-full sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border p-0 bg-transparent shadow-none overflow-hidden"
+        className="flex flex-col w-full h-[100dvh] max-h-[100dvh] max-w-none top-0 left-0 translate-x-0 translate-y-0 rounded-none border-0 gap-0 sm:h-auto sm:max-h-[90vh] sm:max-w-3xl sm:w-full sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl p-0 bg-transparent shadow-none overflow-hidden"
       >
         <DialogTitle className="sr-only">Mietangebot anfordern</DialogTitle>
         <DialogClose
