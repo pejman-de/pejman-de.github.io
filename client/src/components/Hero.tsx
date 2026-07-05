@@ -1,5 +1,6 @@
 import { CheckCircle2, ArrowRight, ShieldCheck, Warehouse, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackClick } from "@/lib/analytics";
 
 interface HeroProps {
   onCtaClick: () => void;
@@ -38,14 +39,29 @@ export default function Hero({ onCtaClick, onExploreClick }: HeroProps) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
-              onClick={onCtaClick}
+              onClick={() => {
+                trackClick("cta_click", {
+                  element_id: "hero_primary_cta",
+                  element_text: "Mietangebot in 24h",
+                  element_location: "hero",
+                });
+                onCtaClick();
+              }}
               size="lg"
               className="bg-brand-cyan text-brand-navy hover:bg-brand-cyan/90 font-bold text-base px-8 py-6 shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20 transition-all active:scale-97"
             >
               Mietangebot in 24h
             </Button>
             <Button
-              onClick={onExploreClick}
+              onClick={() => {
+                trackClick("link_click", {
+                  element_id: "hero_secondary_cta",
+                  element_text: "Fahrzeuge ansehen",
+                  element_location: "hero",
+                  destination_url: "#vehicles",
+                });
+                onExploreClick();
+              }}
               variant="outline"
               size="lg"
               className="border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-white font-semibold text-base px-8 py-6 transition-all active:scale-97" style={{height: '48px'}}
