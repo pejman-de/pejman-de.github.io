@@ -8,7 +8,10 @@
       "Bash(npx tsc *)",
       "Bash(python3 *)",
       "Bash(pnpm preview *)",
-      "Bash(grep -rniE \"DE[ ]?[0-9]{6,}\" client/src)"
+      "Bash(grep -rniE \"DE[ ]?[0-9]{6,}\" client/src)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

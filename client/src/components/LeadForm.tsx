@@ -124,7 +124,7 @@ const CATEGORY_TO_FAHRZEUGTYP: Record<string, string> = {
 };
 
 function LeadForm() {
-  const { selectedCategory } = useLeadFormModal();
+  const { selectedCategory, closeLeadForm } = useLeadFormModal();
   const initialFahrzeugtyp = selectedCategory
     ? (CATEGORY_TO_FAHRZEUGTYP[selectedCategory] ?? selectedCategory.toLowerCase())
     : "";
@@ -239,6 +239,41 @@ function LeadForm() {
     }
   };
 
+  if (isSuccess) {
+    return (
+      <div className="bg-white rounded-xl md:rounded-2xl border border-brand-grey/15 p-8 md:p-12 shadow-xl text-center relative overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300">
+        {/* Tech Grid Background */}
+        <div className="absolute inset-0 rounded-xl md:rounded-2xl bg-[linear-gradient(to_right,#6e7c950a_1px,transparent_1px),linear-gradient(to_bottom,#6e7c950a_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col items-center space-y-6">
+          <div className="h-20 w-20 rounded-full bg-brand-cyan/15 text-brand-cyan flex items-center justify-center">
+            <CheckCircle2 className="h-11 w-11" />
+          </div>
+
+          <h3 className="text-2xl md:text-3xl font-extrabold text-brand-navy tracking-tight leading-snug">
+            Ihre Mietanfrage ist eingegangen!
+          </h3>
+
+          <p className="text-brand-grey leading-relaxed">
+            Wir prüfen Ihre Angaben und melden uns innerhalb von 24 Stunden mit Ihrem individuellen Mietangebot.
+          </p>
+
+          <Button
+            onClick={() => {
+              setIsSuccess(false);
+              setStep(1);
+              reset();
+              closeLeadForm();
+            }}
+            className="bg-brand-cyan text-brand-navy hover:bg-brand-cyan/90 font-bold text-base px-8 py-3 shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20 transition-all active:scale-97 uppercase tracking-wider rounded-xl"
+          >
+            Schließen
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl md:rounded-2xl border border-brand-grey/15 p-4 sm:p-6 md:p-10 shadow-xl relative overflow-hidden">
       <div className="text-center mb-6 md:mb-8">
@@ -249,35 +284,8 @@ function LeadForm() {
           Kostenlos, unverbindlich und ohne Verkaufsgespräch. Formular ausfüllen, Angebot abwarten, fertig.
         </p>
       </div>
-          
-          {isSuccess ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="flex flex-col items-center justify-center py-12 text-center space-y-6"
-            >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-cyan/20 text-brand-cyan animate-bounce">
-                <CheckCircle2 className="h-10 w-10" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-extrabold text-brand-navy">Vielen Dank für Ihre Anfrage!</h3>
-                <p className="text-brand-grey max-w-md mx-auto">
-                  Ihre Daten wurden erfolgreich übermittelt. Unser B2B-Team prüft Ihre Anfrage und sendet Ihnen innerhalb von 24 Stunden Ihr individuelles Mietangebot zu.
-                </p>
-              </div>
-              <Button 
-                onClick={() => {
-                  setIsSuccess(false);
-                  setStep(1);
-                }}
-                className="bg-brand-navy text-white hover:bg-brand-navy/90 font-semibold px-6"
-              >
-                Weitere Anfrage senden
-              </Button>
-            </motion.div>
-          ) : (
-            <div className="space-y-8">
+
+      <div className="space-y-8">
               {/* Fortschrittsanzeige */}
               <div className="relative flex items-center justify-between max-w-md mx-auto mb-10">
               {/* Verbindungslinie */}
@@ -696,7 +704,6 @@ function LeadForm() {
                 />
               </form>
             </div>
-          )}
       </div>
     );
   }
