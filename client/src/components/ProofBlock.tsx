@@ -12,9 +12,9 @@ export default function ProofBlock() {
     {
       icon: CheckCircle,
       title: "Reibungsloser Prozess",
-      subtitle: "Keine B2B-Bürokratie",
+      subtitle: "Keine Bürokratie",
       description: "Im Transportwesen zählt jede Stunde. Darum halten wir alles schlank, von der Anfrage bis zur Übergabe.",
-      details: ["Digitale Vertragsabwicklung", "Fester B2B-Ansprechpartner", "Schnelle Schadensregulierung"],
+      details: ["Digitale Vertragsabwicklung", "Fester Ansprechpartner für Geschäftskunden", "Schnelle Schadensregulierung"],
     },
     {
       icon: Truck,
