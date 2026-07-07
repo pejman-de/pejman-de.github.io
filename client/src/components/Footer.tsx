@@ -67,7 +67,7 @@ export default function Footer({ onScrollToTop }: FooterProps) {
                   }
                   className="hover:text-brand-cyan transition-colors"
                 >
-                  +49 217 58845535
+                  +49 2175 8845535
                 </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-white">
