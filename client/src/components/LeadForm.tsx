@@ -122,8 +122,8 @@ function calculateLeadScore(data: FormData): { grade: "Hot" | "Warm" | "Cold"; p
 }
 
 const CATEGORY_TO_FAHRZEUGTYP: Record<string, string> = {
-  "Sprinter": "sprinter",
-  "Transporter": "transporter",
+  "Kleiner Transporter": "sprinter",
+  "Großer Transporter": "transporter",
   "Wechselbrücke": "wechselbruecke",
   "Kipper": "kipper",
   "Sattelzug": "sattelzug",
@@ -385,8 +385,8 @@ function LeadForm() {
                             <SelectValue placeholder="Bitte wählen..." />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="sprinter">Sprinter (bis 3,5t)</SelectItem>
-                            <SelectItem value="transporter">Transporter (3,5t - 7,5t)</SelectItem>
+                            <SelectItem value="sprinter">Kleiner Transporter (bis 3,5t)</SelectItem>
+                            <SelectItem value="transporter">Großer Transporter (3,5t - 7,5t)</SelectItem>
                             <SelectItem value="wechselbruecke">Wechselbrücke (BDF System)</SelectItem>
                             <SelectItem value="kipper">Kipper (Bau & Schüttgut)</SelectItem>
                             <SelectItem value="sattelzug">Sattelzug (Schwerer Fernverkehr)</SelectItem>
