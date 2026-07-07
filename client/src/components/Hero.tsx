@@ -109,7 +109,7 @@ export default function Hero({ onCtaClick, onExploreClick }: HeroProps) {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-2xl border border-brand-grey/10">
             {/* Real high-quality generated image */}
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663281979359/MSs49dKTPCBrBa2mMEGFXR/hero-trucks-o63nWYNkcFAJ4M2Z6GtHV7.webp"
+              src="/images/hero-fuhrpark.webp"
               alt="ED Rent & Sale Nutzfahrzeug Flotte"
               className="h-full w-full object-cover"
             />
