@@ -19,7 +19,7 @@ export default function SocialProofBar() {
           <div className="group overflow-hidden rounded-xl bg-white border border-brand-grey/10 shadow-sm hover:shadow-md transition-all">
             <div className="relative aspect-[16/10] overflow-hidden">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663281979359/MSs49dKTPCBrBa2mMEGFXR/hero-trucks-o63nWYNkcFAJ4M2Z6GtHV7.webp"
+                src="/images/fuhrpark-standort.webp"
                 alt="Fahrzeughof in Leichlingen"
                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -40,7 +40,7 @@ export default function SocialProofBar() {
           <div className="group overflow-hidden rounded-xl bg-white border border-brand-grey/10 shadow-sm hover:shadow-md transition-all">
             <div className="relative aspect-[16/10] overflow-hidden">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663281979359/MSs49dKTPCBrBa2mMEGFXR/workshop-8RJprvZRnAsjf5wqqiQyRa.webp"
+                src="/images/werkstatt-pruefung.webp"
                 alt="Professionelle LKW Werkstatt"
                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
