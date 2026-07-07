@@ -113,21 +113,6 @@ export default function Hero({ onCtaClick, onExploreClick }: HeroProps) {
               alt="ED Rent & Sale Nutzfahrzeug Flotte"
               className="h-full w-full object-cover"
             />
-            
-            {/* Subtle Glassmorphism Overlay */}
-            <div className="absolute bottom-6 left-6 right-6 rounded-xl border border-white/20 bg-brand-navy/65 p-6 text-white backdrop-blur-md md:p-8">
-              <div className="flex flex-col space-y-2">
-                <div className="text-xs font-bold tracking-widest text-brand-cyan uppercase">
-                  Sofort einsatzbereit
-                </div>
-                <div className="text-lg font-bold md:text-xl">
-                  Premium-Mietfuhrpark für Logistik & Bau
-                </div>
-                <p className="text-xs text-white/80 leading-relaxed md:text-sm">
-                  Alle Fahrzeuge sind technisch geprüft und vollgetankt startklar. Holen Sie Ihr Fahrzeug direkt bei uns ab oder lassen Sie es liefern. Den Rest erledigen Sie.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
