@@ -31,7 +31,7 @@ export default function FAQ() {
       <section className="py-20 bg-brand-light/50 border-t border-brand-grey/10">
         <div className="container max-w-xl text-center bg-white rounded-2xl border border-brand-grey/15 shadow-xl p-8 md:p-12">
           <span className="text-xs font-bold uppercase tracking-wider text-brand-cyan">
-            B2B Fahrzeugvermietung
+            Fahrzeugvermietung für Geschäftskunden
           </span>
           <h3 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-navy">
             Bereit für Ihr Mietangebot?
