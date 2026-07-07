@@ -26,18 +26,18 @@ const categories: Category[] = [
     description: "Der Allrounder mit Ladebordwand für Verteilerverkehr und Umzüge.",
   },
   {
-    id: "wechselbruecke",
-    title: "Wechselbrücke",
-    image: "/images/wechselbruecke.webp",
-    badge: "BDF-System",
-    description: "Maximale Flexibilität für kombinierten Ladungsverkehr und Systemlogistik.",
-  },
-  {
     id: "kipper",
     title: "Kipper",
     image: "/images/kipper.webp",
     badge: "3-Seiten-Kipper",
     description: "Robust und geländegängig. Für Baustelle, Schüttgut und alles, was Dreck macht.",
+  },
+  {
+    id: "wechselbruecke",
+    title: "Wechselbrücke",
+    image: "/images/wechselbruecke.webp",
+    badge: "BDF-System",
+    description: "Maximale Flexibilität für kombinierten Ladungsverkehr und Systemlogistik.",
   },
   {
     id: "sattelzug",
