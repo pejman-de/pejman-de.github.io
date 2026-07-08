@@ -136,7 +136,7 @@ export default function Footer({ onScrollToTop }: FooterProps) {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white">
+        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-white">
           <span>
             &copy; {currentYear} ED Rent & Sale. Alle Rechte vorbehalten.
           </span>
