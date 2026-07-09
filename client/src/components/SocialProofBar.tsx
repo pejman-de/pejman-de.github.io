@@ -61,7 +61,7 @@ export default function SocialProofBar() {
           <div className="group overflow-hidden rounded-xl bg-white border border-brand-grey/10 shadow-sm hover:shadow-md transition-all">
             <div className="relative aspect-[16/10] overflow-hidden">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663281979359/MSs49dKTPCBrBa2mMEGFXR/handover-UFeNb2qdxiVJQknhkTnyDf.webp"
+                src="/images/service-uebergabe.webp"
                 alt="Fahrzeugübergabe an Kunden"
                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
