@@ -1,18 +1,22 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { trackPageView } from "@/lib/analytics";
 import { captureLeadContext } from "@/lib/leadContext";
 import { ConsentBanner } from "./components/ConsentBanner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
+
+// Home bleibt sofort geladen, das sehen die meisten Besucher zuerst.
+// Impressum, Datenschutz und die 404-Seite werden selten aufgerufen und
+// erst bei Bedarf nachgeladen, das verkleinert das Haupt-Bundle spuerbar.
+const NotFound = lazy(() => import("@/pages/NotFound"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LeadFormModalProvider } from "./contexts/LeadFormModalContext";
 import LeadFormModal from "./components/LeadFormModal";
 import Home from "./pages/Home";
-import Impressum from "./pages/Impressum";
-import Datenschutz from "./pages/Datenschutz";
+const Impressum = lazy(() => import("./pages/Impressum"));
+const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 
 
 function Router() {
@@ -36,14 +40,16 @@ function Router() {
   }, [location]);
 
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/impressum"} component={Impressum} />
-      <Route path={"/datenschutz"} component={Datenschutz} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={null}>
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/impressum"} component={Impressum} />
+        <Route path={"/datenschutz"} component={Datenschutz} />
+        <Route path={"/404"} component={NotFound} />
+        {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
