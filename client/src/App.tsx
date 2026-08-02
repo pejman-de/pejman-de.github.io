@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { trackPageView } from "@/lib/analytics";
 import { captureLeadContext } from "@/lib/leadContext";
+import { ConsentBanner } from "./components/ConsentBanner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
@@ -60,6 +61,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <ConsentBanner />
           <LeadFormModalProvider>
             <Router />
             <LeadFormModal />
