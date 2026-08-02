@@ -19,7 +19,9 @@ import {
   trackFormError,
   trackFormStart,
   trackFormSubmit,
+  trackFormSubmitFailed,
 } from "@/lib/analytics";
+import { getLeadContext } from "@/lib/leadContext";
 
 // Zod validation schema
 const formSchema = z.object({
@@ -236,11 +238,7 @@ function LeadForm() {
         versicherung: data.versicherung,
         offer_type: data.offer_type,
         lead_path: data.lead_path,
-        utm_source: new URLSearchParams(window.location.search).get("utm_source") || "direct",
-        utm_medium: new URLSearchParams(window.location.search).get("utm_medium") || "none",
-        utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign") || "none",
-        utm_term: new URLSearchParams(window.location.search).get("utm_term") || "none",
-        utm_content: new URLSearchParams(window.location.search).get("utm_content") || "none",
+        ...getLeadContext(),
       };
 
       const response = await fetch(import.meta.env.VITE_LEAD_ENDPOINT, {
@@ -249,15 +247,28 @@ function LeadForm() {
         body: JSON.stringify(payload),
       });
 
+      const ergebnis = await response.json().catch(() => ({} as Record<string, unknown>));
+
       if (!response.ok) {
-        throw new Error(`Lead submission failed with status ${response.status}`);
+        const referenz = typeof ergebnis.reference === "string" ? ergebnis.reference : undefined;
+        trackFormSubmitFailed("lp1_mietanfrage", response.status, referenz);
+        toast.error("Es gab einen Fehler beim Senden.", {
+          description: referenz
+            ? `Bitte erneut versuchen. Referenznummer: ${referenz}`
+            : "Bitte versuchen Sie es erneut oder rufen Sie uns an.",
+        });
+        return;
       }
+
+      // Der Worker rechnet den Score selbst und liefert ihn zurueck. Der
+      // Clientwert dient nur noch als Rueckfallebene fuer GA4.
+      const serverGrade = typeof ergebnis.leadGrade === "string" ? ergebnis.leadGrade : leadGrade;
 
       // Wichtig: reportCompleted() VOR setIsSuccess, damit modal_close (falls der
       // Nutzer direkt danach schließt) NICHT zusätzlich als form_abandon zählt.
       reportCompleted();
       trackFormSubmit("lp1_mietanfrage", 2, {
-        lead_grade: leadGrade,
+        lead_grade: serverGrade,
         fahrzeugtyp: data.fahrzeugtyp,
         tonnage: data.tonnage,
         mietdauer: data.mietdauer,
@@ -268,8 +279,10 @@ function LeadForm() {
       reset();
       setStep(1); // Zurück auf Schritt 1 nach erfolgreichem Reset
     } catch (error) {
-      trackFormError(2, ["submit_failed"]);
-      toast.error("Es gab einen Fehler beim Senden. Bitte versuchen Sie es erneut.");
+      trackFormSubmitFailed("lp1_mietanfrage", 0);
+      toast.error("Die Verbindung wurde unterbrochen.", {
+        description: "Bitte prüfen Sie Ihre Internetverbindung und senden Sie erneut.",
+      });
     } finally {
       setIsSubmitting(false);
     }
