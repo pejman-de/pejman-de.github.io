@@ -20,6 +20,7 @@ import {
   trackFormStart,
   trackFormSubmit,
   trackFormSubmitFailed,
+  createEventId,
 } from "@/lib/analytics";
 import { getLeadContext } from "@/lib/leadContext";
 
@@ -212,13 +213,26 @@ function LeadForm() {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Honeypot: Feld ist fuer echte Nutzer unsichtbar, nur Bots fuellen es aus.
+    // Bewusst KEIN Worker-Aufruf und KEIN form_submit/reportCompleted, damit
+    // Bot-Treffer die Conversion-Zahlen nicht verfaelschen. Der Worker wuerde
+    // auf den Honeypot mit 200 antworten, was hier sonst als Lead zaehlt.
+    if (data.website) {
+      setIsSuccess(true);
+      return;
+    }
+
     setIsSubmitting(true);
+
+    // Einmal pro Absendeversuch. Ein Retry erzeugt bewusst eine neue ID.
+    const eventId = createEventId();
 
     try {
       const { grade, points } = calculateLeadScore(data);
       const leadGrade = grade;
 
       const payload = {
+        event_id: eventId,
         firstName: data.vorname,
         lastName: data.nachname,
         email: data.email,
@@ -267,7 +281,7 @@ function LeadForm() {
       // Wichtig: reportCompleted() VOR setIsSuccess, damit modal_close (falls der
       // Nutzer direkt danach schließt) NICHT zusätzlich als form_abandon zählt.
       reportCompleted();
-      trackFormSubmit("lp1_mietanfrage", 2, {
+      trackFormSubmit("lp1_mietanfrage", 2, eventId, {
         lead_grade: serverGrade,
         fahrzeugtyp: data.fahrzeugtyp,
         tonnage: data.tonnage,
