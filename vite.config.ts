@@ -6,8 +6,9 @@ import { defineConfig, type Plugin } from "vite";
 
 // Schreibt beim Build eine CNAME-Datei in das Ausgabeverzeichnis.
 // Die Domain kommt aus der Umgebungsvariable SITE_DOMAIN. Damit laesst
-// sich derselbe Build auf die pjslm-Subdomain oder auf die Zieldomain
-// unter ed-rent.de veroeffentlichen, ohne eine Datei zu aendern.
+// sich derselbe Build bei Bedarf auf eine abweichende Domain
+// veroeffentlichen, ohne eine Datei zu aendern. Der Vorgabewert ist die
+// Produktivdomain, damit auch ein Build ohne SITE_DOMAIN korrekt ist.
 function cnameSchreiben(vorgabe: string): Plugin {
   return {
     name: "ed-cname-schreiben",
@@ -26,7 +27,7 @@ function cnameSchreiben(vorgabe: string): Plugin {
 const plugins = [
   react(),
   tailwindcss(),
-  cnameSchreiben("lp1.pjslm.de"),
+  cnameSchreiben("vermietung.ed-rent.de"),
 ];
 
 export default defineConfig({
