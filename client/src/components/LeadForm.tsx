@@ -287,6 +287,13 @@ function LeadForm() {
         tonnage: data.tonnage,
         mietdauer: data.mietdauer,
       });
+      // Meta-Lead bewusst direkt statt ueber GTM: der GTM-Trigger loeste
+      // reproduzierbar dreimal aus (Klick, Formular senden, form_submit),
+      // davon zweimal ohne event_id. Siehe Testprotokoll 19.08.2026.
+      // fbq existiert nur, wenn das consent-gegatete Basis-Tag geladen wurde.
+      if (typeof window.fbq === "function") {
+        window.fbq("track", "Lead", {}, { eventID: eventId });
+      }
 
       setIsSuccess(true);
       toast.success("Anfrage erfolgreich gesendet! Wir melden uns in Kürze.");
