@@ -25,12 +25,12 @@ import {
 import { getLeadContext } from "@/lib/leadContext";
 
 // Zeitraum statt Datumsfeld: punktgleich zur bisherigen Datumslogik, aber ohne
-// das auf dem Handy fragilste Bedienelement. Die Werte gehen unveraendert an den
-// Worker, der daraus fuer Brevo wieder ein Datum ableitet.
+// das auf dem Handy fragilste Bedienelement. Die Werte gehen unverändert an den
+// Worker, der daraus das Brevo-Attribut MIETBEGINN befüllt.
 const STARTTERMIN_OPTIONEN = [
   { value: "7_tage", label: "In den nächsten 7 Tagen", punkte: 30 },
   { value: "1_3_wochen", label: "In 1–3 Wochen", punkte: 20 },
-  { value: "spaeter", label: "Später", punkte: 10 },
+  { value: "später", label: "Später", punkte: 10 },
 ] as const;
 
 // Zod validation schema
@@ -100,7 +100,7 @@ function calculateLeadScore(data: FormData): { grade: "Hot" | "Warm" | "Cold"; p
   if (zeitraum) {
     points += zeitraum.punkte;
   } else {
-    // Rueckfallebene: aeltere Sitzungen koennen noch ein Datum senden.
+    // Rückfallebene: ältere Sitzungen können noch ein Datum senden.
     const diffDays = Math.ceil((new Date(data.starttermin).getTime() - Date.now()) / 86400000);
     if (isNaN(diffDays)) points += 10;
     else if (diffDays < 7) points += 30;
