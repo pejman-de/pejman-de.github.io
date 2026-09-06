@@ -282,6 +282,7 @@ function LeadForm() {
       // Nutzer direkt danach schließt) NICHT zusätzlich als form_abandon zählt.
       reportCompleted();
       trackFormSubmit("lp1_mietanfrage", 2, eventId, {
+        status_code: response.status,
         lead_grade: serverGrade,
         fahrzeugtyp: data.fahrzeugtyp,
         tonnage: data.tonnage,
