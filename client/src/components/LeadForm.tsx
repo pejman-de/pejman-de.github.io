@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon, Shield, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { Shield, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   trackModalStepView,
@@ -24,15 +24,22 @@ import {
 } from "@/lib/analytics";
 import { getLeadContext } from "@/lib/leadContext";
 
+// Zeitraum statt Datumsfeld: punktgleich zur bisherigen Datumslogik, aber ohne
+// das auf dem Handy fragilste Bedienelement. Die Werte gehen unveraendert an den
+// Worker, der daraus fuer Brevo wieder ein Datum ableitet.
+const STARTTERMIN_OPTIONEN = [
+  { value: "7_tage", label: "In den nächsten 7 Tagen", punkte: 30 },
+  { value: "1_3_wochen", label: "In 1–3 Wochen", punkte: 20 },
+  { value: "spaeter", label: "Später", punkte: 10 },
+] as const;
+
 // Zod validation schema
 const formSchema = z.object({
   // Schritt 1
   fahrzeugtyp: z.string().min(1, "Bitte wählen Sie einen Fahrzeugtyp."),
   tonnage: z.string().min(1, "Bitte wählen Sie die gewünschte Tonnage."),
   mietdauer: z.string().min(1, "Bitte wählen Sie die Mietdauer."),
-  starttermin: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Bitte geben Sie ein gültiges Startdatum an.",
-  }),
+  starttermin: z.string().min(1, "Bitte wählen Sie einen Zeitraum."),
   plz: z.string().min(3, "Bitte geben Sie eine gültige PLZ oder Region ein."),
   bereitstellung: z.string().min(1, "Bitte wählen Sie eine Option."),
   nachricht: z.string().optional(),
@@ -89,16 +96,16 @@ function calculateLeadScore(data: FormData): { grade: "Hot" | "Warm" | "Cold"; p
   points += tonnagePoints[data.tonnage] ?? 10;
 
   // 2. Starttermin (Dringlichkeit)
-  const today = new Date();
-  const start = new Date(data.starttermin);
-  const diffTime = start.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) {
-    points += 30;
-  } else if (diffDays <= 21) {
-    points += 20;
+  const zeitraum = STARTTERMIN_OPTIONEN.find((o) => o.value === data.starttermin);
+  if (zeitraum) {
+    points += zeitraum.punkte;
   } else {
-    points += 10;
+    // Rueckfallebene: aeltere Sitzungen koennen noch ein Datum senden.
+    const diffDays = Math.ceil((new Date(data.starttermin).getTime() - Date.now()) / 86400000);
+    if (isNaN(diffDays)) points += 10;
+    else if (diffDays < 7) points += 30;
+    else if (diffDays <= 21) points += 20;
+    else points += 10;
   }
 
   // 3. Mietdauer (Auftragsgroesse/Bindung)
@@ -191,8 +198,6 @@ function LeadForm() {
       "tonnage",
       "mietdauer",
       "starttermin",
-      "plz",
-      "bereitstellung",
     ]);
     if (valid) {
       trackModalStepCompleted(1, "Fahrzeugdetails");
@@ -200,7 +205,7 @@ function LeadForm() {
       reportStep(2);
       setStep(2);
     } else {
-      const errorFields = ["fahrzeugtyp", "tonnage", "mietdauer", "starttermin", "plz", "bereitstellung"].filter(
+      const errorFields = ["fahrzeugtyp", "tonnage", "mietdauer", "starttermin"].filter(
         (field) => !!errors[field as keyof typeof errors]
       );
       trackFormError(1, errorFields);
@@ -486,64 +491,26 @@ function LeadForm() {
                         )}
                       </div>
 
-                      {/* Starttermin */}
+                      {/* Gewünschter Zeitraum */}
                       <div className="space-y-2">
-                        <Label htmlFor="starttermin" className="font-semibold text-brand-navy">Gewünschter Starttermin *</Label>
-                        <div className="relative">
-                          <Input
-                            type="date"
-                            id="starttermin"
-                            {...register("starttermin")}
-                            className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white pl-10"
-                            min={new Date().toISOString().split("T")[0]}
-                          />
-                          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-grey" />
-                        </div>
-                        {errors.starttermin && (
-                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>{errors.starttermin.message as string}</span>
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Einsatzregion / PLZ */}
-                      <div className="space-y-2">
-                        <Label htmlFor="plz" className="font-semibold text-brand-navy">Einsatzregion / PLZ *</Label>
-                        <Input
-                          type="text"
-                          id="plz"
-                          placeholder="z.B. 42799 oder Leichlingen"
-                          {...register("plz")}
-                          className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white"
-                        />
-                        {errors.plz && (
-                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>{errors.plz.message as string}</span>
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Abholung oder Lieferung */}
-                      <div className="space-y-2">
-                        <Label htmlFor="bereitstellung" className="font-semibold text-brand-navy">Bereitstellung *</Label>
+                        <Label htmlFor="starttermin" className="font-semibold text-brand-navy">Gewünschter Zeitraum *</Label>
                         <Select
-                          value={watch("bereitstellung")}
-                          onValueChange={(val) => setValue("bereitstellung", val, { shouldValidate: true })}
+                          value={watch("starttermin")}
+                          onValueChange={(val) => setValue("starttermin", val, { shouldValidate: true })}
                         >
                           <SelectTrigger className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white">
                             <SelectValue placeholder="Bitte wählen..." />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="abholung">Selbstabholung in Leichlingen</SelectItem>
-                            <SelectItem value="lieferung">Lieferung an Einsatzort</SelectItem>
+                            {STARTTERMIN_OPTIONEN.map((o) => (
+                              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
-                        {errors.bereitstellung && (
+                        {errors.starttermin && (
                           <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
                             <AlertCircle className="h-3.5 w-3.5" />
-                            <span>{errors.bereitstellung.message as string}</span>
+                            <span>{errors.starttermin.message as string}</span>
                           </p>
                         )}
                       </div>
@@ -696,6 +663,47 @@ function LeadForm() {
                           </p>
                         )}
 
+                      </div>
+
+                      {/* Einsatzregion / PLZ */}
+                      <div className="space-y-2">
+                        <Label htmlFor="plz" className="font-semibold text-brand-navy">Einsatzregion / PLZ *</Label>
+                        <Input
+                          type="text"
+                          id="plz"
+                          placeholder="z.B. 42799 oder Leichlingen"
+                          {...register("plz")}
+                          className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white"
+                        />
+                        {errors.plz && (
+                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            <span>{errors.plz.message as string}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Abholung oder Lieferung */}
+                      <div className="space-y-2">
+                        <Label htmlFor="bereitstellung" className="font-semibold text-brand-navy">Bereitstellung *</Label>
+                        <Select
+                          value={watch("bereitstellung")}
+                          onValueChange={(val) => setValue("bereitstellung", val, { shouldValidate: true })}
+                        >
+                          <SelectTrigger className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white">
+                            <SelectValue placeholder="Bitte wählen..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="abholung">Selbstabholung in Leichlingen</SelectItem>
+                            <SelectItem value="lieferung">Lieferung an Einsatzort</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {errors.bereitstellung && (
+                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            <span>{errors.bereitstellung.message as string}</span>
+                          </p>
+                        )}
                       </div>
                     </div>
 
