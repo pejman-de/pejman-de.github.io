@@ -40,15 +40,13 @@ const formSchema = z.object({
   tonnage: z.string().min(1, "Bitte wählen Sie die gewünschte Tonnage."),
   mietdauer: z.string().min(1, "Bitte wählen Sie die Mietdauer."),
   starttermin: z.string().min(1, "Bitte wählen Sie einen Zeitraum."),
-  plz: z.string().min(3, "Bitte geben Sie eine gültige PLZ oder Region ein."),
-  bereitstellung: z.string().min(1, "Bitte wählen Sie eine Option."),
   nachricht: z.string().optional(),
   versicherung: z.boolean(),
 
   // Schritt 2
   vorname: z.string().min(2, "Bitte geben Sie Ihren Vornamen an."),
   nachname: z.string().min(2, "Bitte geben Sie Ihren Nachnamen an."),
-  unternehmen: z.string().min(2, "Bitte geben Sie Ihr Unternehmen an."),
+  unternehmen: z.string().optional(),
   email: z.string().min(1, "Bitte geben Sie Ihre E-Mail-Adresse an.").email("Bitte geben Sie eine gültige E-Mail-Adresse an."),
   telefon: z.string().optional(),
   consent: z.boolean().refine((val) => val === true, {
@@ -66,13 +64,11 @@ interface FormData {
   tonnage: string;
   mietdauer: string;
   starttermin: string;
-  plz: string;
-  bereitstellung: string;
   nachricht?: string;
   versicherung: boolean;
   vorname: string;
   nachname: string;
-  unternehmen: string;
+  unternehmen?: string;
   email: string;
   telefon?: string;
   consent: boolean;
@@ -166,8 +162,6 @@ function LeadForm() {
       tonnage: "",
       mietdauer: "",
       starttermin: "",
-      plz: "",
-      bereitstellung: "",
       nachricht: "",
       versicherung: false,
       vorname: "",
@@ -252,8 +246,6 @@ function LeadForm() {
         tonnage: data.tonnage,
         mietdauer: data.mietdauer,
         starttermin: data.starttermin,
-        plz: data.plz,
-        bereitstellung: data.bereitstellung,
         versicherung: data.versicherung,
         offer_type: data.offer_type,
         lead_path: data.lead_path,
@@ -612,7 +604,7 @@ function LeadForm() {
 
                       {/* Unternehmen */}
                       <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="unternehmen" className="font-semibold text-brand-navy">Unternehmen *</Label>
+                        <Label htmlFor="unternehmen" className="font-semibold text-brand-navy">Unternehmen (optional)</Label>
                         <Input
                           type="text"
                           id="unternehmen"
@@ -665,46 +657,7 @@ function LeadForm() {
 
                       </div>
 
-                      {/* Einsatzregion / PLZ */}
-                      <div className="space-y-2">
-                        <Label htmlFor="plz" className="font-semibold text-brand-navy">Einsatzregion / PLZ *</Label>
-                        <Input
-                          type="text"
-                          id="plz"
-                          placeholder="z.B. 42799 oder Leichlingen"
-                          {...register("plz")}
-                          className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white"
-                        />
-                        {errors.plz && (
-                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>{errors.plz.message as string}</span>
-                          </p>
-                        )}
-                      </div>
 
-                      {/* Abholung oder Lieferung */}
-                      <div className="space-y-2">
-                        <Label htmlFor="bereitstellung" className="font-semibold text-brand-navy">Bereitstellung *</Label>
-                        <Select
-                          value={watch("bereitstellung")}
-                          onValueChange={(val) => setValue("bereitstellung", val, { shouldValidate: true })}
-                        >
-                          <SelectTrigger className="border-brand-grey/30 focus:border-brand-cyan focus:ring-brand-cyan h-11 bg-white">
-                            <SelectValue placeholder="Bitte wählen..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="abholung">Selbstabholung in Leichlingen</SelectItem>
-                            <SelectItem value="lieferung">Lieferung an Einsatzort</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {errors.bereitstellung && (
-                          <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>{errors.bereitstellung.message as string}</span>
-                          </p>
-                        )}
-                      </div>
                     </div>
 
                     {/* Einwilligung Datenschutz */}
